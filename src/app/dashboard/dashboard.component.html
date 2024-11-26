@@ -54,7 +54,7 @@
 
     <!-- Main Content -->
     <div class="col py-3 bg-light" style="overflow-y: auto; height: 100vh">
-      <h1 class="text-center mb-4 w-100 p-3 dashheader">Dashboard</h1>
+      <h1 class="text-center mb-4 w-100 p-3 dashheader">HIV TRACKER</h1>
 
       <!-- Patients Table -->
       <div *ngIf="showPatients">
@@ -252,7 +252,11 @@
               <th>Exit Status</th>
             </tr>
           </thead>
-          <tbody>
+          <div class="text-center p-5" *ngIf="dynamicData.length === 0">
+            <h1 class="alert alert-danger mx-auto">No Calls Yet !</h1>
+          </div>
+
+          <tbody *ngIf="dynamicData.length > 0">
             <tr *ngFor="let data of dynamicData">
               <td>{{ data.reminder_call_number }}</td>
               <td>{{ data.reminder_date }}</td>

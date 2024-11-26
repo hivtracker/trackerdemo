@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-new-patient',
-  imports:[CommonModule,ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './new-patient.component.html',
   styleUrls: ['./new-patient.component.css'],
 })
@@ -37,19 +37,21 @@ export class NewPatientComponent {
   async onSubmit() {
     if (this.newPatientForm.valid) {
       const patientData = this.newPatientForm.value;
-
+  
       try {
         const { data, error } = await this.supabaseService.addStaticPatient(patientData);
-
+  
         if (error) {
           console.error('Error adding patient:', error);
         } else {
           console.log('Patient added successfully:', data);
-          this.router.navigate(['/dashboard']);
+          // After successful addition, navigate back to the dashboard with reload flag
+          this.router.navigate(['/dashboard'], { queryParams: { reload: true } });
         }
       } catch (error) {
         console.error('Error submitting form:', error);
       }
     }
   }
+  
 }

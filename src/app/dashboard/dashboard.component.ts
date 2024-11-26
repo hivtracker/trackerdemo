@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SupabaseService } from '../superbase.service';
 import { CommonModule } from '@angular/common';
@@ -19,10 +19,18 @@ export class DashboardComponent {
   newPatient = false;
   editPatientForm: FormGroup;
   editPatientFormVisible = false;
-  showDynamicData:boolean=false;
+  showDynamicData: boolean = false;
 
-  constructor(private supabaseService: SupabaseService, private router: Router, private fb: FormBuilder) {
+  constructor(
+    private supabaseService: SupabaseService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    private fb: FormBuilder
+  ) {
+    // Load patients initially
     this.loadPatients();
+
+    // Initialize edit form
     this.editPatientForm = this.fb.group({
       name: ['', Validators.required],
       dob: ['', Validators.required],
@@ -39,9 +47,17 @@ export class DashboardComponent {
     });
   }
 
+  ngOnInit() {
+    // Check for query params and reload patients if reload=true
+    this.activatedRoute.queryParams.subscribe((params) => {
+      if (params['reload'] === 'true') {
+        this.loadPatients(); // Reload patients if query param is set
+      }
+    });
+  }
+
   // Fetch all static patients data
   async loadPatients() {
- 
     const { data, error } = await this.supabaseService.getStaticPatients();
     if (error) {
       console.error('Error fetching patients:', error);
@@ -52,10 +68,10 @@ export class DashboardComponent {
 
   // Load the selected patient data into the edit form
   loadPatientForEdit(patient: any) {
-    this.showPatients = false; 
+    this.showPatients = false;
     this.newPatient = false;  // Show new patient form
     this.selectedPatient = patient;
-    this.showDynamicData=false;
+    this.showDynamicData = false;
     this.editPatientForm.patchValue({
       name: patient.name,
       dob: patient.dob,
@@ -71,8 +87,8 @@ export class DashboardComponent {
       favourite_tv: patient.favourite_tv,
     });
 
-  // Set the form to be visible
-  this.editPatientFormVisible = true;
+    // Set the form to be visible
+    this.editPatientFormVisible = true;
   }
 
   // Handle form submission for saving changes
@@ -109,12 +125,12 @@ export class DashboardComponent {
     this.dynamicData = []; // Clear dynamic data
   }
 
-    // Function to navigate to the new patient form
-    navigateToAddPatient() {
-      this.showDynamicData=false;
-      this.showPatients = false;  // Hide patient list
-      this.newPatient = true;  // Show new patient form
-    }
+  // Function to navigate to the new patient form
+  navigateToAddPatient() {
+    this.showDynamicData = false;
+    this.showPatients = false;  // Hide patient list
+    this.newPatient = true;  // Show new patient form
+  }
 
   // Logout function
   async logout() {
