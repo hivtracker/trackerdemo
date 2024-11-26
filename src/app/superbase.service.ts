@@ -1,62 +1,88 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { environment } from '../environments/environment.development';
+
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-
 export class SupabaseService {
   private supabase: SupabaseClient;
 
   constructor() {
     // Initialize Supabase client
     this.supabase = createClient(
-      'https://xxgqkuyepvuhgwcooerh.supabase.co', // Replace with your Supabase URL
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4Z3FrdXllcHZ1aGd3Y29vZXJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzIzODg2MTQsImV4cCI6MjA0Nzk2NDYxNH0.PKmLZGCU3YU5xJY5qMxcmqRXqVfUtpEQsUWHno8WIA8' // Replace with your Supabase anon key
+      environment.supabase.url,
+      environment.supabase.key
     );
   }
 
+  // Authentication Methods
   async login(email: string, password: string) {
     return this.supabase.auth.signInWithPassword({ email, password });
-   
   }
 
-  // Check if user is logged in
   async getUser() {
     return this.supabase.auth.getUser();
   }
 
-  // Logout method
   async logout() {
     return this.supabase.auth.signOut();
   }
 
-  async testGetUser() {
-    try {
-      const response = await this.getUser();
-      console.log('User data:', response.data.user);
-    } catch (error) {
-      console.error('Error fetching user:', error);
-    }
+  // ----------------------
+  // Patient Data Functions
+  // ----------------------
+
+  // Fetch all static patient data
+  async getStaticPatients() {
+    return this.supabase.from('static_patient_data').select('*');
   }
 
-  async testLoginAndGetUser() {
-    try {
-      // Replace with valid credentials
-      const loginResponse = await this.login('ochalfie@gmail.com', '1234567');
-      console.log('Login response:', loginResponse);
-  
-      if (loginResponse.error) {
-        console.error('Login failed:', loginResponse.error.message);
-        return;
-      }
-  
-      // Fetch user after login
-      const userResponse = await this.getUser();
-      console.log('User after login:', userResponse.data.user);
-    } catch (error) {
-      console.error('Error during login or fetching user:', error);
-    }
+  // Fetch all dynamic patient data linked to a specific patient
+  async getDynamicData(patientId: string) {
+    return this.supabase
+      .from('dynamic_patient_data')
+      .select('*')
+      .eq('patient_id', patientId);
   }
-  
+
+  // Fetch static patient data with dynamic data
+  async getPatientWithDynamicData(patientId: string) {
+    return this.supabase
+      .from('static_patient_data')
+      .select(`*, dynamic_patient_data(*)`)
+      .eq('id', patientId);
+  }
+
+  // Add a new patient to static_patient_data
+  async addStaticPatient(patientData: any) {
+    return this.supabase.from('static_patient_data').insert(patientData);
+  }
+
+  // Add new dynamic data for a patient
+  async addDynamicData(dynamicData: any) {
+    return this.supabase.from('dynamic_patient_data').insert(dynamicData);
+  }
+
+  // Update static patient data by ID
+  async updateStaticPatient(patientId: string, updatedData: any) {
+    return this.supabase
+      .from('static_patient_data')
+      .update(updatedData)
+      .eq('id', patientId);
+  }
+
+  // Update dynamic patient data by ID
+  async updateDynamicData(dynamicId: string, updatedData: any) {
+    return this.supabase
+      .from('dynamic_patient_data')
+      .update(updatedData)
+      .eq('id', dynamicId);
+  }
+
+  // Delete a patient and their associated dynamic data
+  async deletePatient(patientId: string) {
+    return this.supabase.from('static_patient_data').delete().eq('id', patientId);
+  }
 }

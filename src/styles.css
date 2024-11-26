@@ -5,8 +5,8 @@ body {
 }
 
 .sidebarbg {
-  background-color: #fffde7 !important;
-  color: #000000 !important;
+  background-color: #247393 !important;
+  color: #ffffff !important;
 }
 .nav-item .blackbtn {
   color: #ffffff;
@@ -27,7 +27,15 @@ body {
   padding-bottom: 30px;
   text-align: center;
 }
+.dashheader {
+  color: #000000;
+  background-color: #dfdfdf;
+}
 
 .logininput {
   border: 2px solid #000000;
+}
+.subtitle {
+  text-align: center;
+  color: #a4a4a4;
 }

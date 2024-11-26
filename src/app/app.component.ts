@@ -14,8 +14,7 @@ export class AppComponent {
   constructor(private supabaseService: SupabaseService) {}
 
   ngOnInit() {
-    this.supabaseService.testLoginAndGetUser();
-    this.supabaseService.testGetUser();
+    this.supabaseService.getStaticPatients();
   }
 
 }

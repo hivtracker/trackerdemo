@@ -1,6 +1,4 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login/login.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthGuard } from './auth.guard';
 
 export const routes: Routes = [
@@ -15,16 +13,33 @@ export const routes: Routes = [
       import('./dashboard/dashboard.component').then(
         (com) => com.DashboardComponent
       ),
-    canActivate: [AuthGuard], // Protect this route with the AuthGuard
+    canActivate: [AuthGuard],
   },
   {
+    path: 'patient/:id', // Dynamic patient details route
+    loadComponent: () =>
+      import('./patient-details/patient-details.component').then(
+        (com) => com.PatientDetailsComponent
+      ),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'add-patient', // New route for adding a patient
+    loadComponent: () =>
+      import('./new-patient/new-patient.component').then(
+        (com) => com.NewPatientComponent
+      ),
+    canActivate: [AuthGuard], // Ensure that only authenticated users can access
+  },
+  
+  {
     path: '',
-    redirectTo: 'login', // Redirect to login by default
+    redirectTo: 'login',
     pathMatch: 'full',
   },
-  { 
-    path: '**', 
-    redirectTo: 'login', // Redirect any unknown route to login 
+  {
+    path: '**',
+    redirectTo: 'login',
     pathMatch: 'full',
   },
 ];
